@@ -1,0 +1,100 @@
+DOMAIN AGGREGATE PATTERN:
+
+Caracteristicas de um aggregate pattern:
+- Define uma fronteira de consistencia com um conjunto de objetos de dominio fortemente correlacionados (consistence boundary)
+- Um value object pode estar presente em mais de um aggregate
+- Uma entity nao pode estar presente em mais de um aggregate
+- Agrupamento de um ou mais objetos de valor
+- Conjunto de objetos de dominio fortemente correlacionados que devem ser tratados como uma unica unidade de consistencia
+- Eh composto por ao menos uma ENTITY
+- Pode conter diversos Value Objects
+- Uma Entity precisa ser o Aggregate Root
+- Os membros acessiveis ou alterados via Aggregate Root
+- Apenas metodos de negocios devem alterar o estado (evite uso dos sets)
+- Entity Root eh reponsavel por garantir a consistência
+- Segue o SRP (Principio da Responsabilidade Unica)
+
+
+DENTRO DA CONSISTENCE BOUNDARY ESTAO PRESENTES:
+- Aggregate Root -> aplica regras de negocio e verificar invariantes
+- Invariantes -> condicoes que devem ser verdadeiras em toda modificacao. Ex: O saldo de uma conta nunca deve ser negativo
+- Regra de negocio -> definem quando um aggregate pode mudar de estado. Ex: antes de aprovar uma transacao, verifique o saldo
+- Entities / VOs
+
+- Um aggregate garante a consistencia transacional de todos os seus membros
+- Uma transacao deve modificar apenas um aggregate
+- Um aggregate pode reagir a um evento de dominio (eventualmente consistido) emitido por outro aggregate
+
+RELACIONAMENTOS E AGGREGATES
+- Relacoes devem ser unilaterais (root deve conhecer os membros, mas os membros não devem conhecer uns aos outros e nem ao proprio root, respeitando hierarquia)
+- Sao permitidas relacoes entre aggregates, porem devem ser feitas por referencias das identidades (ids) e não referencia direta dos "objetos"
+- Um aggregate root não pode referenciar diretamente o membro de outro aggregate root, somente via id
+
+TAMANHO IDEAL PARA UM AGGREGATE
+- Deve ser suficiente pequeno para ser carregado e modificado com eficiencia (Coesos)
+- Aggregate grande apresenta maior complexidade com transacoes maiores
+- Se pergunte:
+	Todas as entidades precisam estar no mesmo contexto transacional?
+	Existe uma regra de negocio que envolve todas juntas?
+	Eh necessario modificar todas ao mesmo tempo com consistencia garantida?
+	Elas sempre sao acessadas juntas? Ou poderiam estar separadas?
+	
+
+Obs:
+Existem 2 tipos de consistencias: EVENTUAL e TRANSACIONAL
+Isso pode facilitar a identificacao de aggregates no nosso modelo
+
+A consistência eventual e a consistência transacional representam abordagens distintas para garantir a integridade dos dados em sistemas distribuídos, com foco em diferentes prioridades. A consistência transacional oferece um nível mais alto de integridade, garantindo que todas as operações de uma transação sejam aplicadas de forma atômica, consistente, isolada e durável (ACID). Isso significa que as alterações são refletidas simultaneamente em todos os nós do sistema, evitando inconsistências temporárias. Já a consistência eventual prioriza a disponibilidade e a escalabilidade, permitindo que as alterações sejam propagadas de forma assíncrona para diferentes nós, o que pode levar a inconsistências temporárias até que todos os nós se sincronizem.
+
+Padrao para se criar um aggregate root e seus filhos:
+- Definir todas as propriedades com modificador private;
+- Definir todos os gets no padrao record (sem o prefixo get)
+- Definir todos os sets com modificador private (propriedades serao alteradas com metodos change...)
+- Criar construtores, e definir a atribuicao de propriedades com sets)
+- Implementar Factory Method e Builder para inicializar objetos
+- Sempre use o principio CQS para os metodos
+	- Um método CQS segue o princípio CQS (Command Query Separation), que significa:
+	- “Comando” (Command) e “Consulta” (Query) devem ser métodos separados.
+	Um Command:
+		→ Executa uma ação que altera o estado do sistema.
+		→ Não retorna valor (idealmente).
+		→ Exemplo: salvarUsuario(), deletarPedido()
+
+	Uma Query:
+		→ Retorna um valor, mas não altera o estado.
+		→ Exemplo: buscarUsuarioPorId(), getNome()
+	
+ex:
+@Builder(builderClassName = "ExistingOrderItemBuild", builderMethodName = "existing")
+    public OrderItem(OrderItemId id, OrderId orderId, ProductId productId,
+                     ProductName productName, Money price, Quantity quantity,
+                     Money totalAmount) {
+        this.setId(id);
+        this.setOrderId(orderId);
+        this.setProductId(productId);
+        this.setProductName(productName);
+        this.setPrice(price);
+        this.setQuantity(quantity);
+        this.setTotalAmount(totalAmount);
+    }
+
+    @Builder(builderClassName = "BrandNewOrderItemBuild", builderMethodName = "brandNew")
+    private static OrderItem createBrandNew(OrderId orderId, ProductId productId,
+                                 ProductName productName, Money price, Quantity quantity){
+
+        return new OrderItem(
+                new OrderItemId(),
+                orderId,
+                productId,
+                productName,
+                price,
+                quantity,
+                Money.ZERO);
+    }
+    
+obs:
+@Builder(toBuilder = true) => converte o VO em outro VO populado
+    
+- Implemente Test Data Builder
+
+
