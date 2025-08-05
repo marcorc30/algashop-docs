@@ -1,0 +1,104 @@
+Mongo DB armazena registros de dados como documentos em formato BSON, que eh uma representacao binaria JSON
+
+MongoDB Compass eh a interface grafica do mongo
+
+- listar banco de dados
+show databases;
+
+- criar banco de dados
+use <nome_bd>
+
+- criar colecao
+db.createCollection("nome da colacao")
+
+- listar colecoes de um db
+show collections
+
+- apagar uma colecao
+db.<nome_collection>.drop()
+
+- apagar banco de dados
+use <nome_banco_dados>
+db.dropDatabase()
+
+- inserindo documentos nas collections
+insertOne => um documento por vez
+insertMany => varios documentos ao mesmo tempo
+
+ex:
+
+
+db.series.insertOne(
+{
+  "Serie": "Fleabag",
+  "Ano de Lancamento": 2016,
+  "Temporadas disponiveis": 2,
+  "Linguagem": "Ingles",
+  "IMDb Avaliacao": 8.7
+}
+)
+
+db.series.insertMany([
+{
+  "Serie": "Fleabag2",
+  "Ano de Lancamento": 2018,
+  "Temporadas disponiveis": 1,
+  "Linguagem": "Ingles",
+  "IMDb Avaliacao": 8.9
+},
+{
+  "Serie": "Fleabag3",
+  "Ano de Lancamento": 2020,
+  "Temporadas disponiveis": 5,
+  "Linguagem": "Ingles",
+  "IMDb Avaliacao": 9.3
+}
+
+])
+
+- LOCALIZANDO REGISTROS:
+Siga o padrao: db.collection.find(query, projection).limit(x).sort(projection)
+
+- listando os dados de uma collection
+db.usuarios.find()
+
+-listando os dados de um registro
+db.usuarios.find({ nome: "João" })
+
+-listando as series com temporadas menor que 5, somente o campo Serie, limitado a 1 registro 
+db.series.find({"Temporadas disponiveis": {$lt: 5}},{"Serie":1, "_id":0}).limit(1)
+db.series.find({"Temporadas disponiveis": {$lt: 5}},{"Serie":1, "_id":0}).limit(3).sort({"Serie":1})
+
+
+- ATUALIZANDO REGISTROS
+siga o padrao: db.collection.replaceOne(<filter>, <replacement>)
+
+
+db.users.updateOne() -> atualiza um documento por vez
+dd.users.updateMany() -> atualiza varios documentos
+
+ex: atualiza o campo status, ou se não existir, cria o campo
+db.users.updateMany(
+{age: {$lt: 18}},
+{$set: {"status": "reject"}}
+)
+db.series.updateOne({"Serie":"Fleabag3"}, {$set: {"novo campo": "testando"}})
+
+db.series.updateMany({"Serie": {$in: ["Fleabag", "Fleabag2"]}}, {$set: {"Temporadas Disponiveis":15}})
+
+
+- REMOVENDO REGISTROS DA COLECAO
+db.users.deleteOne() -> remove um documento por vez
+db.users.deleteMany() -> remove varios documentos por vez
+
+ex:
+db.users.removeMany({status: "reject"})
+
+db.series.deleteMany({"Temporadas Disponiveis":1})
+db.series.deleteOne({"Serie":"Fleabag"})
+
+df.series.deleteMany() -> remove todos os registros
+
+
+
+
