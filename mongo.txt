@@ -88,6 +88,9 @@ db.series.updateMany({"Serie": {$in: ["Fleabag", "Fleabag2"]}}, {$set: {"Tempora
 
 
 - REMOVENDO REGISTROS DA COLECAO
+siga o padrao: db.collection.updateOne(<filter>, <update>) 
+
+
 db.users.deleteOne() -> remove um documento por vez
 db.users.deleteMany() -> remove varios documentos por vez
 
