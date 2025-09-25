@@ -98,3 +98,47 @@ obs:
 - Implemente Test Data Builder
 
 
+
+- Especializacoes dos Services:
+Domain Service - Camanda de Infra
+Application Service - Camada de Aplicacao
+Infrastructure Service - Camada de Dominio
+
+- Domaim Service Pattern
+* Operacoes de negocio que nao encaixam em nenhuma entity, aggregate ou VO. 
+* Eles apenas usam e coordenam esses objetos de dominio
+* Gerenciam operacoes de negocio e sua regras
+* Trabalham com tipos de dominio
+* Nao guardam estado
+* Nao gerenciam transacoes
+* Nao depende de casos de uso da aplicacao (CRUDS ficam a cargo dos application services)
+
+* Podem ser Interfaces
+
+Perguntas:
+Um DS pode chamar outro?
+* Sim
+
+Podemos persistir em um DS?
+* Operacoes de persistencia excepcionais (operacoes em lote)
+
+Podem retornar VO's?
+* Sim, pois ele tem foco em objetos de dominio
+
+Devemos sempre usar Interfaces nos Services?
+* Nao necessariamente
+
+Sempre ligado a um Aggregate?
+* Nao, pode estar ligado a um VO, etc.. (objetos de negocio)
+
+Podemos alterar mais de um Aggregate?
+* Sim, apesar da recomendacao seja alterar um por vez
+
+Podemos ter um DS para operacoes de CRUD?
+* Sim, so se tiver regras muito importantes
+* Nao crie um DS para toda operacao de CRUD
+
+
+
+
+
